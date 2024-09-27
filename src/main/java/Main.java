@@ -2,17 +2,18 @@ import Utils.Grader;
 import Utils.ProblemGenerator;
 
 public class Main {
+
     public static void main(String[] args) {
-        int numProblems = 11;
-        int range = 10;
-        String exerciseFile = null;
-        String answerFile = null;
+        int numProblems = 10000;
+        int range = 5;
+        /*String exerciseFile = null;
+        String answerFile = null;*/
 
-//        String exerciseFile = "resources/Exercises.txt";
-//        String answerFile = "resources/Answers.txt";
+        String exerciseFile = "resources/Exercises.txt";
+        String answerFile = "resources/Answers.txt";
 
-        /*// 遍历命令行参数
-        for (int i = 0; i < args.length; i++) {
+        // 遍历命令行参数
+        /*for (int i = 0; i < args.length; i++) {
             if ("-n".equals(args[i]) && (i + 1) < args.length) {
                 numProblems = Integer.parseInt(args[i + 1]);
                 i++; // 跳过下一个参数（参数值）
@@ -36,7 +37,8 @@ public class Main {
             // 生成题目模式
             ProblemGenerator generator = new ProblemGenerator(numProblems, range);
             generator.generateProblems();
-        }else if (exerciseFile != null && answerFile != null) {
+        }/*else */
+        if (exerciseFile != null && answerFile != null) {
             // 判题模式
             Grader grader = new Grader(exerciseFile, answerFile);
             grader.grade();
