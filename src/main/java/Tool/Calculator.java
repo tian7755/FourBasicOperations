@@ -3,39 +3,106 @@ package Tool;
 import java.util.*;
 
 public class Calculator {
+
     // 构造函数
     public Calculator() {
     }
 
-    // 评估表达式，生成答案
+    // 根据输入的表达式生成答案，用于生成功能
     public static String calculateExpression(String expression) {
-        // 解析和计算表达式的方法
         Calculator calculator = new Calculator();
-        String expressionToken = calculator. infixToPostfix(expression, false)[1];
+        String expressionToken = calculator. infixToPostfix(expression)[1];
         return calculator.evaluatePostfix(expressionToken);
     }
 
-    // 判断一个字符串是否为分数
-    private static boolean isFraction(String token) {
-        // 带分数或真分数
-        return token.matches("\\d+'\\d+/\\d+") || token.matches("\\d+/\\d+");
+    // 中缀表达式转为后缀表达式
+    private String[] infixToPostfix(String expression) {
+        String index = "0"; // 用于存储题目编号
+        Stack<Character> operatorStack = new Stack<>();
+        StringBuilder output = new StringBuilder();
+        expression = separateParentheses(expression);
+        String[] tokens = expression.split(" "); // 以空格分割表达式
+
+        // 处理题目编号，生成功能使用时忽略
+        if (tokens[0].endsWith(".")) {
+            index = tokens[0].replaceAll("\\.$", ""); // 去掉最后的点
+        }
+
+        // 处理每个token
+        for (int tokenIndex = 0;tokenIndex < tokens.length; tokenIndex++) {
+            String token = tokens[tokenIndex];
+
+            if(token != null && !token.isEmpty()){
+                if (isFraction(token) || Character.isDigit(token.charAt(0))) {
+                    output.append(token).append(" "); // 添加分数或数字
+                } else if (token.equals("(")) {
+                    operatorStack.push('('); // 左括号入栈
+                } else if (token.equals(")")) {
+                    while (!operatorStack.isEmpty() && operatorStack.peek() != '(') {
+                        output.append(operatorStack.pop()).append(" "); // 弹出运算符到输出
+                    }
+                    operatorStack.pop(); // 弹出左括号
+                } else if (isOperator(token.charAt(0))) {
+                    while (!operatorStack.isEmpty() && precedence(token.charAt(0)) <= precedence(operatorStack.peek())) {
+                        output.append(operatorStack.pop()).append(" "); // 弹出高优先级运算符
+                    }
+                    operatorStack.push(token.charAt(0)); // 当前运算符入栈
+                }
+            }
+        }
+
+        while (!operatorStack.isEmpty()) {
+            output.append(operatorStack.pop()).append(" "); // 弹出剩余运算符
+        }
+
+        return new String[]{index, output.toString().trim()}; // 返回编号和后缀表达式，生成功能使用时只用接收后缀表达式
     }
 
-    // 判断是否为四则运算符
-    private static boolean isOperator(char c) {
-        return c == '+' || c == '-' || c == '×' || c == '÷';
+    // 计算后缀表达式结果
+    private String evaluatePostfix(String postfix) {
+        Stack<String> valueStack = new Stack<>();
+        String[] tokens = postfix.split(" ");
+
+        for (String token : tokens) {
+            if (isFraction(token) || Character.isDigit(token.charAt(0))){
+                valueStack.push(token); // 入栈操作数
+            } else if (isOperator(token.charAt(0))) {
+                Fraction b = new Fraction(valueStack.pop());
+                Fraction a = new Fraction(valueStack.pop());
+                String result = calculate_s(a, b, token.charAt(0));
+                valueStack.push(result); // 入栈结果
+            }
+        }
+        return valueStack.pop(); // 返回最终结果
     }
 
-    // 获取运算符优先级
-    private static int precedence(char operator) {
+    // 判题功能使用的计算操作
+    private static String calculate_s(Fraction a, Fraction b, char operator) {
         return switch (operator) {
-            case '+', '-' -> 1;
-            case '×', '÷' -> 2;
-            default -> 0;
+            case '+' -> a.add_s(b);
+            case '-' -> a.subtract_s(b);
+            // case '*':
+            case '×' -> a.multiply_s(b);
+            // case '/':
+            case '÷' -> a.divide_s(b);
+            default -> throw new IllegalArgumentException("无效的运算符: " + operator);
         };
     }
 
-    // 分离括号和操作数
+    // 生成功能使用的计算操作
+    public static Fraction calculate_f(Fraction a, Fraction b, String operator) {
+        return switch (operator) {
+            case " + " -> a.add_f(b);
+            case " - " -> a.subtract_f(b);
+            // case '*':
+            case " × " -> a.multiply_f(b);
+            // case '/':
+            case " ÷ " -> a.divide_f(b);
+            default -> throw new IllegalArgumentException("无效的运算符: " + operator);
+        };
+    }
+
+    // 在表达式中括号和临近的操作数间加入空格，便于之后表达式各个操作数与运算符的提取
     private String separateParentheses(String input) {
         // 初始化一个新的StringBuilder用于构建结果字符串
         StringBuilder result = new StringBuilder();
@@ -65,85 +132,25 @@ public class Calculator {
         }
 
         // 返回结果字符串
-        return result.toString().trim(); // 去除尾部可能的空格
+        return result.toString().trim();
     }
 
-    // 中缀转后缀
-    public String[] infixToPostfix(String expression, boolean isGrader) {
-        String index = "0"; // 用于存储题目编号
-        Stack<Character> operatorStack = new Stack<>();
-        StringBuilder output = new StringBuilder();
-        expression = separateParentheses(expression);
-        String[] tokens = expression.split(" "); // 以空格分割表达式
-
-        // 处理题目编号，生成时不用管
-        if (tokens[0].endsWith(".")) {
-            index = tokens[0].replaceAll("\\.$", ""); // 去掉最后的点
-        }
-
-        // 处理每个token
-        for (int tokenIndex = 0;tokenIndex < tokens.length; tokenIndex++) { // 从第一个操作数开始
-            if (isGrader && tokenIndex == 0){
-                tokenIndex++;
-            }
-            String token = tokens[tokenIndex];
-
-            if(token != null && !token.isEmpty()){//就加了这个
-                if (isFraction(token) || Character.isDigit(token.charAt(0))) {
-                    output.append(token).append(" "); // 添加分数或数字
-                } else if (token.equals("(")) {
-                    operatorStack.push('('); // 左括号入栈
-                } else if (token.equals(")")) {
-                    while (!operatorStack.isEmpty() && operatorStack.peek() != '(') {
-                        output.append(operatorStack.pop()).append(" "); // 弹出运算符到输出
-                    }
-                    operatorStack.pop(); // 弹出左括号
-                } else if (isOperator(token.charAt(0))) {
-                    while (!operatorStack.isEmpty() && precedence(token.charAt(0)) <= precedence(operatorStack.peek())) {
-                        output.append(operatorStack.pop()).append(" "); // 弹出高优先级运算符
-                    }
-                    operatorStack.push(token.charAt(0)); // 当前运算符入栈
-                }
-            }
-        }
-
-        while (!operatorStack.isEmpty()) {
-            output.append(operatorStack.pop()).append(" "); // 弹出剩余运算符
-        }
-
-        return new String[]{index, output.toString().trim()}; // 返回编号和后缀表达式，生成时只用接收[1]，即后缀表达式
-    }
-
-    //计算后缀表达式结果
-    public String evaluatePostfix(String postfix) {
-        Stack<String> valueStack = new Stack<>();
-        String[] tokens = postfix.split(" ");
-
-        for (String token : tokens) {
-            if (isFraction(token) || Character.isDigit(token.charAt(0))){
-                valueStack.push(token); // 入栈操作数
-            } else if (isOperator(token.charAt(0))) {
-                Fraction b = new Fraction(valueStack.pop());
-                Fraction a = new Fraction(valueStack.pop());
-                String result = calculate(a, b, token.charAt(0));
-                valueStack.push(result); // 入栈结果
-            }
-        }
-        return valueStack.pop(); // 返回最终结果
-    }
-
-    // 生成计算操作
-    private String calculate(Fraction a, Fraction b, char operator) {
+    // 获取运算符优先级
+    private static int precedence(char operator) {
         return switch (operator) {
-            case '+' -> a.add(b);
-            case '-' -> a.subtract(b);
-            // case '*':
-            case '×' -> a.multiply(b);
-            // case '/':
-            case '÷' -> a.divide(b);
-            default -> throw new IllegalArgumentException("无效的运算符: " + operator);
+            case '+', '-' -> 1;
+            case '×', '÷' -> 2;
+            default -> 0;
         };
     }
 
+    // 判断一个字符串是否为带分数或真分数
+    private static boolean isFraction(String token) {
+        return token.matches("\\d+'\\d+/\\d+") || token.matches("\\d+/\\d+");
+    }
 
+    // 判断是否为四则运算符
+    private static boolean isOperator(char c) {
+        return c == '+' || c == '-' || c == '×' || c == '÷';
+    }
 }
