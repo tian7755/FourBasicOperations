@@ -1,11 +1,11 @@
 package Utils;
 
 import java.io.*;
-import java.nio.file.Files;
+import java.util.List;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.List;
 
 public class FileUtils {
 
@@ -35,17 +35,17 @@ public class FileUtils {
             try {
                 Files.createDirectory(path);
             }catch (IOException e){
-                System.out.println("无法创建文件夹： "+ path);
+                System.out.println("无法创建文件夹： "+path);
                 e.printStackTrace();
                 return;
             }
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             int index = 1;
-            for (int i = 0; i < data.size(); i++) {
-                String trimmedData = data.get(i).replaceAll("^\\s+", "").trim();
+            for (String datum : data) {
+                String trimmedData = datum.replaceAll("^\\s+", "").trim();
                 if (!trimmedData.isEmpty()) {
-                    writer.write((index) + ". " + trimmedData );
+                    writer.write((index) + ". " + trimmedData);
                     writer.newLine();
                     index++;
                 }

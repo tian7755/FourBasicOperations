@@ -40,10 +40,8 @@ public class Calculator {
         }
 
         // 处理每个token
-        for (int tokenIndex = 0;tokenIndex < tokens.length; tokenIndex++) {
-            String token = tokens[tokenIndex];
-
-            if(token != null && !token.isEmpty()){
+        for (String token : tokens) {
+            if (token != null && !token.isEmpty()) {
                 if (isFraction(token) || Character.isDigit(token.charAt(0))) {
                     output.append(token).append(" "); // 添加分数或数字
                 } else if (token.equals("(")) {
@@ -52,7 +50,9 @@ public class Calculator {
                     while (!operatorStack.isEmpty() && operatorStack.peek() != '(') {
                         output.append(operatorStack.pop()).append(" "); // 弹出运算符到输出
                     }
-                    operatorStack.pop(); // 弹出左括号
+                    if(!operatorStack.isEmpty()){
+                        operatorStack.pop(); // 弹出左括号
+                    }
                 } else if (isOperator(token.charAt(0))) {
                     while (!operatorStack.isEmpty() && precedence(token.charAt(0)) <= precedence(operatorStack.peek())) {
                         output.append(operatorStack.pop()).append(" "); // 弹出高优先级运算符
@@ -114,7 +114,7 @@ public class Calculator {
     }
 
     // 在表达式中括号和临近的操作数间加入空格，便于之后表达式各个操作数与运算符的提取
-    private String separateParentheses(String input) {
+    public static String separateParentheses(String input) {
         // 初始化一个新的StringBuilder用于构建结果字符串
         StringBuilder result = new StringBuilder();
         StringBuilder temp = new StringBuilder(); // 用于暂存括号之间的字符
@@ -156,7 +156,7 @@ public class Calculator {
     }
 
     // 判断一个字符串是否为带分数或真分数
-    private static boolean isFraction(String token) {
+    public static boolean isFraction(String token) {
         return token.matches("\\d+'\\d+/\\d+") || token.matches("\\d+/\\d+");
     }
 

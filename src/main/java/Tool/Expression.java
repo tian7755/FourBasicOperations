@@ -85,13 +85,14 @@ public class Expression {
     // 生成表达式二叉树
     public static Node buildExpression(int currentOperators) {
         if (currentOperators == 0) {
+            // 生成操作数
             return new Node(Fraction.createFraction(range), null, null);
         }
         OperatorNode parent = new OperatorNode(null, null, OPERATOR[random.nextInt(OPERATOR.length)]);
 
+        // 递归生成左子树和右子树
         int leftOperators = random.nextInt(currentOperators);
         int rightOperators = currentOperators - leftOperators - 1;
-
         parent.lchild = buildExpression(leftOperators);
         parent.rchild = buildExpression(rightOperators);
 
@@ -122,13 +123,12 @@ public class Expression {
         return print(root);
     }
 
-    // 调整存储随机表达式的二叉树为存储规范化表达式的二叉树,实际是统一加法与乘法子表达式左大右小
+    // 调整存储随机表达式的二叉树为存储规范化表达式的二叉树,实际是统一加法与乘法子表达式左小右大
     public static void adjustTree(Node root) {
         if (root == null) {
             return;
         }
-        if (root instanceof OperatorNode) {
-            OperatorNode operatorNode = (OperatorNode) root;
+        if (root instanceof OperatorNode operatorNode) {
             if (ADD.equals(operatorNode.operator) || MUL.equals(operatorNode.operator)) {
                 if (Fraction.compare(root.lchild.value, root.rchild.value)) {
                     Node temp = root.lchild;
