@@ -1,9 +1,9 @@
 package Utils;
 
+import java.util.*;
+
 import Tool.Expression;
 import Tool.Calculator;
-
-import java.util.*;
 
 public class ProblemGenerator {
 
@@ -34,9 +34,6 @@ public class ProblemGenerator {
                 problem = Expression.generateExpression(); // 生成算术表达式
                 adjustedExpression = Expression.getAdjustedExpression();
             } while (adjustedExpressions.contains(adjustedExpression)); // 如果问题重复，重新生成
-
-            System.out.println(problem);
-            System.out.println(adjustedExpression);
 
             String answer = Calculator.calculateExpression(problem); // 计算表达式的答案
 

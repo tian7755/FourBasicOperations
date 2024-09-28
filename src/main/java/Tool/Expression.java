@@ -127,8 +127,7 @@ public class Expression {
         if (root == null) {
             return;
         }
-        if (root instanceof OperatorNode) {
-            OperatorNode operatorNode = (OperatorNode) root;
+        if (root instanceof OperatorNode operatorNode) {
             if (ADD.equals(operatorNode.operator) || MUL.equals(operatorNode.operator)) {
                 if (Fraction.compare(root.lchild.value, root.rchild.value)) {
                     Node temp = root.lchild;

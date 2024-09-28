@@ -1,6 +1,7 @@
 package Utils;
 
 import java.util.*;
+
 import Tool.Calculator;
 
 public class Grader {
@@ -66,20 +67,16 @@ public class Grader {
     // 统计正确、错误和异常答案对应的题目编号及其数量
     private static void statistics(List<Map<String, String>> standardAnswers, List<Map<String, String>> studentAnswers,
                                    ArrayList<Integer> correctList, ArrayList<Integer> wrongList, ArrayList<Integer> errorList) {
-        for (int i = 0; i < standardAnswers.size(); i++) {
-            Map<String, String> standardMap = standardAnswers.get(i);
-
+        for (Map<String, String> standardMap : standardAnswers) {
             for (Map.Entry<String, String> entry : standardMap.entrySet()) {
                 String index = entry.getKey();
                 String standardAnswer = entry.getValue();
                 boolean isExist = false;
 
-                for(int j = 0; j < studentAnswers.size(); j++) {
-                    Map<String, String> studentMap = studentAnswers.get(j);
-
+                for (Map<String, String> studentMap : studentAnswers) {
                     for (Map.Entry<String, String> entryStudent : studentMap.entrySet()) {
                         String index_s = entryStudent.getKey();
-                        if(index_s.equals(index)) {
+                        if (index_s.equals(index)) {
                             isExist = true;
                             String studentAnswer = entryStudent.getValue();
                             if (standardAnswer.equals(studentAnswer)) {
